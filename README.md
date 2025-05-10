@@ -25,7 +25,7 @@ One can search, navigate, and modify data using a parser. It’s versatile and s
 8) Visualize Product Data using a Bar Chart
 
 ### Program:
-```PYTHON
+```
 import requests
 from bs4 import BeautifulSoup
 import re
@@ -39,7 +39,7 @@ def convert_price_to_float(price):
 def get_amazon_products(search_query):
     base_url = 'https://www.amazon.in'
     headers = {
-        'User-Agent': 'Your User Agent'  # Add your User Agent here
+        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/114.0.0.0 Safari/537.36'
     }
 
     search_query = search_query.replace(' ', '+')
@@ -49,16 +49,36 @@ def get_amazon_products(search_query):
     products_data = []  # List to store product information
 
     if response.status_code == 200:
-        /* TYPE YOUR CODE HERE
+        soup = BeautifulSoup(response.content, 'html.parser')
+
+        # Locate product listings
+        product_elements = soup.select('div.s-main-slot div[data-component-type="s-search-result"]')
+
+        for product in product_elements:
+            title_elem = product.select_one('h2 span')
+            price_elem = product.select_one('span.a-price-whole')
+
+            if title_elem and price_elem:
+                title = title_elem.text.strip()
+                price = price_elem.text.strip()
+                products_data.append({
+                    'Product': title,
+                    'Price': price
+                })
+                print(f'Product: {title}\nPrice: ₹{price}\n---')
+
+    else:
+        print(f'Failed to fetch Amazon page: {response.status_code}')
 
     return sorted(products_data, key=lambda x: convert_price_to_float(x['Price']))
 
+# Get search input
 search_query = input('Enter product to search on Amazon: ')
 products = get_amazon_products(search_query)
 
-# Displaying product data using a bar chart
+# Plotting the data
 if products:  # Check if products list is not empty
-    product_names = [product['Product'][:30] if len(product['Product']) > 30 else product['Product'] for product in products]
+    product_names = [product['Product'][:30] + '...' if len(product['Product']) > 30 else product['Product'] for product in products]
     product_prices = [convert_price_to_float(product['Price']) for product in products]
 
     plt.figure(figsize=(10, 6))
@@ -66,7 +86,7 @@ if products:  # Check if products list is not empty
     plt.xlabel('Price')
     plt.ylabel('Product')
     plt.title(f'Products and their Prices on Amazon for {search_query.capitalize()} (Ascending Order)')
-    plt.yticks(range(len(product_prices)), product_names)  # Setting y-axis labels as shortened product names
+    plt.yticks(range(len(product_prices)), product_names)
     plt.tight_layout()
     plt.show()
 else:
@@ -75,5 +95,8 @@ else:
 ```
 
 ### Output:
+![image](https://github.com/user-attachments/assets/47238b49-9152-4a94-b9d6-348b7f3fa445)
+![image](https://github.com/user-attachments/assets/5d79303c-674c-4d09-af36-0e44ebc4c481)
+
 
 ### Result:
