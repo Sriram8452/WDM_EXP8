@@ -100,3 +100,4 @@ else:
 
 
 ### Result:
+Thus, to perform Web Scraping on Amazon using (beautifulsoup) Python has been executed successfully.
